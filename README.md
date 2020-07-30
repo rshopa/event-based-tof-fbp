@@ -49,7 +49,7 @@ Alternatively, [```.nrrd```](http://teem.sourceforge.net/nrrd/format.html) can b
 Here, a proper order should be preserved for al coordinates.
 
 ## Output formats
-Available output file formats are ```.rds``` and ```.nrrd```. The former is native to R, while the latter is also used in [J-PET MLEM](https://github.com/JPETTomography/j-pet-mlem) application. You need external app to view ```.nrrd``` images or dedicated libraries, e.g. [MRIcroGL](https://www.nitrc.org/projects/mricrogl), [Aliza](https://www.aliza-dicom-viewer.com/), [pynrrd](https://pypi.org/project/pynrrd/) etc.
+Available output file formats are ```.rds``` and ```.nrrd```. The former is native to R (has the same list structure as [described above](https://github.com/rshopa/event-based-tof-fbp#map-formats-for-corrections)), while the latter is also used in [J-PET MLEM](https://github.com/JPETTomography/j-pet-mlem) application. You need external app to view ```.nrrd``` images or dedicated libraries, e.g. [MRIcroGL](https://www.nitrc.org/projects/mricrogl), [Aliza](https://www.aliza-dicom-viewer.com/), [pynrrd](https://pypi.org/project/pynrrd/) etc. Store the outcome as ```.rds``` only if you are familiar with basic R: you need to run it interactively or write a dedicated script to view the images.
 
 ## Script architecture
 The script is designed to work as quick as possible, hence R environments are utilised for [encapsulation](https://r6.r-lib.org/articles/Performance.html). The only exclusion has been made for JSON reader ```source/ReadFromJSON.R```, which uses Reference class.
