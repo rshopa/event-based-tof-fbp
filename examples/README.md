@@ -19,7 +19,7 @@ There is also a tool to create full 3D sensitivity map using 2D transverse cross
 "zoom": 2,
 "png-xy-size": 0.2
 ```
-Two features here are used in the same way as in [STIR](http://stir.sourceforge.net/) framework: ```number-of-rings``` artificially splits J-PET scintillator strips into axial "rings", meaning that the number of voxels will amount to ```2*number-of-rings – 1``` in axial direction. ```zoom``` is used to increase the sampling in transverse direction compared to projection space, so that XY-size of the voxel will be &Delta;xy = &pi;R/(N<sub>strips</sub> &middot; zoom).
+Two features here are employed in the same way as in [STIR](http://stir.sourceforge.net/) framework: ```number-of-rings``` artificially splits J-PET scintillator strips into axial "rings", meaning that the number of voxels will amount to ```2*number-of-rings – 1``` in axial direction, ```zoom``` is used to increase the sampling in transverse direction compared to projection space, so that XY-size of the voxel will be &Delta;xy = &pi;R/(N<sub>strips</sub> &middot; zoom).
 
 To run a generation of 3D sensitivity map using XY ```.png```-dummy, execute the following:
 ```
@@ -29,39 +29,37 @@ This will save the map as ```.rds``` in the same directory as 2D image.
 
 **Caution: the examples presented here don't cover the whole transverse FOV!** You need to manually restrict XY-span of the image using parameter ```restrict-FOV-axes-range``` in the main JSON file (see below).
 
-<img src="https://github.com/rshopa/event-based-tof-fbp/blob/master/examples/images/FOV_sizes.png" width="500">
+<img src="https://github.com/rshopa/event-based-tof-fbp/blob/master/examples/images/FOV_sizes.png" width="550">
 
 ## JSON parameters for the reconstruction
-Event-based TOF FBP operates with single &gamma;-quanta emission, applying three-component kernel over the estimated annihilation point to estimate the intensity and update it in the voxels within ellipsoid-shaped volume (region-of-response - ROR).
+Event-based TOF FBP operates with single back-to-back &gamma;-quanta emission, applying three-component kernel over the estimated annihilation point to estimate the intensity and update it in the voxels within ellipsoid-shaped volume (region-of-response - ROR).
 
-![img]("../event-based-tof-fbp/examples/images/LBL_scheme.png")
+<img src="https://github.com/rshopa/event-based-tof-fbp/blob/master/examples/images/LBL_scheme.png" width="500">
 
-Three components include:  TOF-kernel, Z-kernel (uncertainty of hit position inside the strip) and FBP filter, applied on transverse plane in the direction, perpendicular to line-of-response (LOR). Outside of the ellipsoid the intensity is almost zero and not updated, to boost the performance.
+Three components/filters include:  TOF-kernel, Z-kernel (uncertainty of hit position inside the strip) and FBP filter, applied on transverse plane in the direction, perpendicular to line-of-response (LOR). Outside of the ellipsoid the intensity is almost zero and not updated, to boost the performance.
 
-The parameters that describe reconstruction process are set in JSON file. Templates for various phantoms can be found in ```\examples\phantoms```. **You need to generate sensitivity map as described above or remove the line ```"sensitivity-map-path": ...```.** *Convention for units* is that **cm** is used for distances and **ps** - for times. The main sections include:
+The parameters that describe reconstruction process are set in JSON file. Templates ```.json``` for various phantoms can be found in ```\examples\phantoms```. **You need to generate sensitivity map as described above or remove the line** ```"sensitivity-map-path": ...```. *Convention for units* is that **cm** is used for distances and **ps** - for times. The main objects are:
 
-* ```"input-output"``` - paths to files and options to save (attenuation and sensitivity corrections are optional and can be left out or assigned to ```null```);
+* ```"input-output"``` - paths to files and options to save (attenuation and sensitivity corrections are optional and can be left out or assigned to null);
 * ```"virtual-scanner"``` - geometry of an effective ideal cylindric scanner closest to the real one (used for filters and voxel size definition). Temporal resolution ```"CRT"``` and standard deviation (SD) along Z for hit position ```"sigma-z"``` (relevant for wavelength shifters) are optional, used for the definition of TOF and Z-filters;
 * ```FBP-filter```, ```TOF-filter``` and ```Z-filter``` - parameters for each kernel component (see below);
 * ```"post-filter"``` (optional) - median or mean filter applied after the reconstruction;
 * ```"restrict-FOV-axes-range"``` (optional) - a vector in cm that define the volume of the FOV to be cut for the output image. E.g. [15,15,10] means the span [-15 cm, 15 cm] for X and Y, [-10 cm, 10 cm] - for Z.
 
+Three types of 1D kernel applied over LOR and Z are available: Gaussian, CDF and inverse Gaussian. The first one needs only SD (```"sigma"```) and semi-axis length for the ellipsoid ROR (```"semi-axis-span-sigma-factor"```). The latter denote the absolute fractions of SD, where the intensity is updated. For example, the value 3.0 means that only those voxels will be updated, which lies within &plusmn;3.0&sigma; from the annihilation point. If not given, ```"sigma"``` is estimated from ```"CRT"``` and/or hit uncertainty ```"sigma-z"``` (see above).
 
+[CDF (cumulative distribution function)](https://en.wikipedia.org/wiki/Cumulative_distribution_function) set as ```"filter-type"``` for ```"TOF-filter"``` and/or ```"Z-filter"``` uses additional parameter - ```"half-bin-width"``` (if not assigned or null, set as &sigma; &middot; sqrt[2 &middot; log(2)]). It could reflect one-half of a TOF 'bin' size &Delta;l/2 along LOR or axial voxel dimension &Delta;z/2. The kernel *h*( &middot; ) or then reflects the probability of the detection in a certain bin/voxel, estimated as shown in the picture below - the area under the Gaussian profile.
 
-Three types of 1D kernel applied over LOR and Z are available: Gaussian, CDF and inverse Gaussian. The first one needs only SD (```"sigma"```) and semi-axis length for the ellipsoid ROR (```"semi-axis-span-sigma-factor"```). The latter denote the absolute fractions of SD, where the intensity is updated. For example, the value 3.0 means that only those voxels will be updated, which lies within &plusmn;3.0&sigma; from the annihilation point.
+<img src="https://github.com/rshopa/event-based-tof-fbp/blob/master/examples/images/CDF_filter.png" width="480">
 
-CDF (cumulative distribution function) set as ```"filter-type"``` for ```"TOF-filter"``` and/or ```"Z-filter"``` uses additional parameter - ```"half-bin-width"``` (if not assigned or null, set as &sigma; &middot; sqrt[2 &middot; log(2)]). It could reflect one-half of a TOF bin size &Delta;l/2 along LOR or axial voxel dimension &Delta;z/2. The kernel *h*( &middot; ) or then reflects the probability of the detection in a certain bin/voxel, estimated as shown on the picture below - the area under the Gaussian profile.
+Incorporation of TOF requires FBP filter to be modified (it no longer operates with the whole radio-tracer through the object). Additional regularisation parameter &tau; is added to plain ramp filter, as introduced in the following work: https://doi.org/10.1186/s42492-019-0035-4. Along with smoothing window defined by parameters &alpha; (```"alpha"```) and &omega;<sub>C</sub> (```"omega-cut"```), it could be adjusted in various ranges as shown in the following pictre:
 
-[img CDF]
+<img src="https://github.com/rshopa/event-based-tof-fbp/blob/master/examples/images/FBP_TOF_filter.png" width="900">
 
-Incorporation of TOF requires FBP filter to be modified (it no longer operates with the whole radio-tracer through the object). Additional regularisation parameter &tau; is added to plain ramp filter, as introduced in the following work: https://doi.org/10.1186/s42492-019-0035-4. Along with smoothing window defined by parameters &alpha; and &omega;<sub>C</sub> (```"omega-cut"```), it could be adjusted in various ranges as shown in the following pictre:
+Closed-form definition of FBP filter *W*(&omega;) is available only in Fourier domain, therefore a hybrid approach is implemented: a "dummy" is created and then inverse [FFT](https://en.wikipedia.org/wiki/Fast_Fourier_transform "Fast Fourier transform") applied to get a profile within a span &plusmn;```"dummy-FFT-span"```&middot;&Delta;s, where the latter (projection sampling &Delta;s = &pi;*R*/*N*<sub>strips</sub>) can be assigned manually as ```"delta-s"``` or otherwise estimated from scanner geometry. Default ```"dummy-FFT-span"``` is &plusmn;35. As mentioned, parameter ```zoom``` is used to increase the sampling on transverse plane (default is 2).
 
-[img FBP]
+High-pass filtering by inverse Gaussian (set ```"filter-type"``` to ```"inverse-gaussian"```) is similar to FBP case. The major difference is in cut-off frequiency. For convenience, it is adjusted by alternative parameter - ```"nu-cut-intensity-factor"```, which denotes the fraction of maximum, above which the function is cut in Fourier space. For instance, setting it to 4 would mean that on normalised scale the inverse Gaussian profile *H*<sup> -1</sup>(&nu;) will be set to zero if it is above 1/4th of maximum, as in the picture below (original normal density distribution *H*(&nu;) is shown for comparison):
 
-Closed-form definition is available only in Fourier domain, therefore a hybrid approach is implemented: a "dummy" is created and then inverse [FFT](https://en.wikipedia.org/wiki/Fast_Fourier_transform "Fast Fourier transform") applied to get a profile within a span &plusmn;```"dummy-FFT-span"```&middot;&Delta;s, where the latter can be assigned manually as ```"delta-s"``` or otherwise estimated from scanner geometry. Default ```"dummy-FFT-span"``` is &plusmn;35. As mentioned, parameter ```zoom``` is used to increase the sampling on transverse plane (default is 2).
+<img src="https://github.com/rshopa/event-based-tof-fbp/blob/master/examples/images/Inverse_and_Gauss.png" width="550">
 
-High-pass filtering by inverse Gaussian (set ```"filter-type"``` to ```"inverse-gaussian"```) is similar to FBP case. The major difference is in cut-off frequiency. For convenience, it is adjusted by alternative parameter - ```"nu-cut-intensity-factor"```, which denotes the fraction of maximum, above which the function is cut in Fourier space. For instance, setting it to 4 would mean that on normalised scale the inverse Gaussian profile *H*<sup> -1</sup>(&nu;) will be set to zero if it is above 1/4th of maximum, as in the picture below:
-
-[img INV Gauss]
-
-For Gaussian and CDF kernel shapes, the optimal span ```"semi-axis-span-sigma-factor"``` is somewhere between &plusmn;3.5&sigma; and &plusmn;4.0&sigma;. However, as seen from the image on the right (image space), even without cut-off or smoothing, inverse form *h*<sup> -1</sup>(&moddot;) requires much larger semi-axis for ellipsoid. In the example given for point-like source, it is set to 9.0 for all filters, but we do not recommend it lower than 13.0 for inverse Gaussian. Using three high-pass filters with cun-off and smoothing window (lower ```"alpha"```) might require even larger ```"semi-axis-span-sigma-factor"``` for each component, affecting drastically the performance which depend on the volume of the ellipsoid.
+For Gaussian and CDF kernel shapes, the optimal span ```"semi-axis-span-sigma-factor"``` is somewhere between &plusmn;3.5&sigma; and &plusmn;4.0&sigma;. However, as seen from the image on the right (image space), even without cut-off or smoothing, inverse form *h*<sup> -1</sup>(&middot;) requires much larger semi-axis for ROR ellipsoid. In the example given for a point-like source, it is set to 9.0 for all filters, but we do not recommend it to be reduced below 13.0 for inverse Gaussian. 3D kernel composed of three high-pass filters with additional cut-offs and smoothing windows (lower ```"alpha"```) might require even larger ```"semi-axis-span-sigma-factor"``` for each component, affecting drastically the performance which depend on the volume of the ellipsoid.
