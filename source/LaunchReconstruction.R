@@ -39,7 +39,8 @@ FBP.TOF.calculator    <- LORbyLORCalculator(reconstruction.params)
 post.calculator       <- PostRecoTools(reconstruction.params)
 
 cat("Importing data file... ")
-B2B.emissions <- importASCII(reconstruction.params[["input_path"]], FALSE)
+B2B.emissions <- if(grepl("\\.rds$", input.path <- reconstruction.params[["input_path"]],ignore.case = T))
+  readRDS(input.path) else importASCII(input.path, FALSE)
 cat("Done!\n")
 
 cat("--------------------------\nInitiating reconstruction:\n")
@@ -82,33 +83,3 @@ cat(paste0("\r\nSaving to file:", export.path,
           if(reconstruction.params[[".export_as_nrrd"]]) ".nrrd" else ".rds", "\n"))
 exportImage(output.3D.image, export.path, Rds = !(reconstruction.params[[".export_as_nrrd"]]))
 setwd(current.dir)
-
-# # source("SetEnvWithIniParams.R")
-# source("LORbyLORCalculator.R")
-# source("PostRecoTools.R")
-# # library or require?
-# library("Rcpp", lib.loc="~/R/x86_64-pc-linux-gnu-library/3.5")
-# # library("RcppArmadillo", lib.loc="~/R/x86_64-pc-linux-gnu-library/3.5")
-# JS <- JSONReader(json_params_file="json/PtSrc_parameters.json")
-# # JS$corrections$attenuation<-NULL
-# # INI <- SetEnvWithIniParams(JS)
-# LBL <- LORbyLORCalculator(JS)
-# PT <- PostRecoTools(JS)
-# 
-# 
-# launchFullReconstruction <- function(B2B.emissions, Calculator, Verbose=FALSE){
-#   if(Verbose){
-#     cat("Reconstruction has started.\n")
-#     Start.time <- Sys.time()
-#   }
-#   for(iter in seq_len(nrow(B2B.emissions))){
-#     Calculator[["addLORToMap"]](B2B.emissions[iter,])
-#     if(Verbose) if(iter%%100==0) cat(paste("Events:",iter,"\r"))
-#   }
-#   if(Verbose){
-#     cat("Done! Total time:\n")
-#     Sys.time() - Start.time # Time difference
-#     cat(paste("Total events:", iter,"\n"))
-#   }
-# }
-# 

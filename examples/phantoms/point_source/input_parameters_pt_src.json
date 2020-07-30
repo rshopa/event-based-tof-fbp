@@ -1,0 +1,45 @@
+{
+  "input-output":{
+		"input-data-path": "examples/phantoms/point_source/AdjHits384str_10_0_0_SiPM.txt",
+		"output-file-name": "ReconstructedImage",
+		"attenuation-map-path": null,
+		"sensitivity-map-path": "examples/sensitivity_map/sensitivity_map.rds",
+                "save-as-nrrd": false
+	},
+	"virtual-scanner":{
+	  "radius": 43.73,
+	  "number-of-strips": 384,
+	  "length": 50,
+	  "number-of-rings": 96,
+	  "CRT": 235.196,
+	  "sigma-z": null
+	},
+	"FBP-filter":{
+	  "delta-s": null,
+	  "alpha": 1.0,
+	  "omega-cut": 0.5,
+	  "tau-regularisation": 15.0,
+	  "zoom": null,
+	  "dummy-FFT-span": null,
+	  "semi-axis-span-sigma-factor": 9.0
+	},
+	"TOF-filter":{
+	  "filter-type": "inverse-gauss",
+	  "sigma": null,
+	  "half-bin-width": null,
+	  "alpha": 1.0,
+	  "nu-cut-intensity-factor": 2,
+	  "dummy-FFT-span": 35,
+	  "semi-axis-span-sigma-factor": 9
+	},
+	"Z-filter":{
+	  "filter-type": "inverse-gauss",
+	  "sigma": null,
+	  "half-bin-width": null,
+	  "alpha": 1.0,
+	  "nu-cut-intensity-factor": 2,
+	  "dummy-FFT-span": 35,
+	  "semi-axis-span-sigma-factor": 9
+	},
+	"restrict-FOV-axes-range": [20,20,null]
+}

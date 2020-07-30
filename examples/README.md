@@ -1,5 +1,5 @@
 # Setting the parameters for the event-based 3D TOF FBP
-The parameters for the reconstruction, sensitivity map generation, as well as the geometry of the scanner, are set in [JSON format](https://www.json.org/json-en.html). In order to define them properly, you need to understand the key principles of the event-based TOF FBP.
+The parameters for the reconstruction, sensitivity map generation, as well as the geometry of the scanner, are set in [JSON format](https://www.json.org/json-en.html). In order to define them properly, you may need to understand the key principles of the event-based TOF FBP. Please refer to the dedicated work here: https://doi.org/10.5506/APhysPolB.50.675.
 
 ## Files needed for sensitivity correction
 Sensitivity correction is used to take into account the imperfections of the scanner. It is generally done in a straightforward way:
@@ -32,3 +32,36 @@ This will save the map as ```.rds``` in the same directory as 2D image.
 <img src="https://github.com/rshopa/event-based-tof-fbp/blob/master/examples/images/FOV_sizes.png" width="500">
 
 ## JSON parameters for the reconstruction
+Event-based TOF FBP operates with single &gamma;-quanta emission, applying three-component kernel over the estimated annihilation point to estimate the intensity and update it in the voxels within ellipsoid-shaped volume (region-of-response - ROR).
+
+![img]("../event-based-tof-fbp/examples/images/LBL_scheme.png")
+
+Three components include:  TOF-kernel, Z-kernel (uncertainty of hit position inside the strip) and FBP filter, applied on transverse plane in the direction, perpendicular to line-of-response (LOR). Outside of the ellipsoid the intensity is almost zero and not updated, to boost the performance.
+
+The parameters that describe reconstruction process are set in JSON file. Templates for various phantoms can be found in ```\examples\phantoms```. **You need to generate sensitivity map as described above or remove the line ```"sensitivity-map-path": ...```.** *Convention for units* is that **cm** is used for distances and **ps** - for times. The main sections include:
+
+* ```"input-output"``` - paths to files and options to save (attenuation and sensitivity corrections are optional and can be left out or assigned to ```null```);
+* ```"virtual-scanner"``` - geometry of an effective ideal cylindric scanner closest to the real one (used for filters and voxel size definition). Temporal resolution ```"CRT"``` and standard deviation (SD) along Z for hit position ```"sigma-z"``` (relevant for wavelength shifters) are optional, used for the definition of TOF and Z-filters;
+* ```FBP-filter```, ```TOF-filter``` and ```Z-filter``` - parameters for each kernel component (see below);
+* ```"post-filter"``` (optional) - median or mean filter applied after the reconstruction;
+* ```"restrict-FOV-axes-range"``` (optional) - a vector in cm that define the volume of the FOV to be cut for the output image. E.g. [15,15,10] means the span [-15 cm, 15 cm] for X and Y, [-10 cm, 10 cm] - for Z.
+
+
+
+Three types of 1D kernel applied over LOR and Z are available: Gaussian, CDF and inverse Gaussian. The first one needs only SD (```"sigma"```) and semi-axis length for the ellipsoid ROR (```"semi-axis-span-sigma-factor"```). The latter denote the absolute fractions of SD, where the intensity is updated. For example, the value 3.0 means that only those voxels will be updated, which lies within &plusmn;3.0&sigma; from the annihilation point.
+
+CDF (cumulative distribution function) set as ```"filter-type"``` for ```"TOF-filter"``` and/or ```"Z-filter"``` uses additional parameter - ```"half-bin-width"``` (if not assigned or null, set as &sigma; &middot; sqrt[2 &middot; log(2)]). It could reflect one-half of a TOF bin size &Delta;l/2 along LOR or axial voxel dimension &Delta;z/2. The kernel *h*( &middot; ) or then reflects the probability of the detection in a certain bin/voxel, estimated as shown on the picture below - the area under the Gaussian profile.
+
+[img CDF]
+
+Incorporation of TOF requires FBP filter to be modified (it no longer operates with the whole radio-tracer through the object). Additional regularisation parameter &tau; is added to plain ramp filter, as introduced in the following work: https://doi.org/10.1186/s42492-019-0035-4. Along with smoothing window defined by parameters &alpha; and &omega;<sub>C</sub> (```"omega-cut"```), it could be adjusted in various ranges as shown in the following pictre:
+
+[img FBP]
+
+Closed-form definition is available only in Fourier domain, therefore a hybrid approach is implemented: a "dummy" is created and then inverse [FFT](https://en.wikipedia.org/wiki/Fast_Fourier_transform "Fast Fourier transform") applied to get a profile within a span &plusmn;```"dummy-FFT-span"```&middot;&Delta;s, where the latter can be assigned manually as ```"delta-s"``` or otherwise estimated from scanner geometry. Default ```"dummy-FFT-span"``` is &plusmn;35. As mentioned, parameter ```zoom``` is used to increase the sampling on transverse plane (default is 2).
+
+High-pass filtering by inverse Gaussian (set ```"filter-type"``` to ```"inverse-gaussian"```) is similar to FBP case. The major difference is in cut-off frequiency. For convenience, it is adjusted by alternative parameter - ```"nu-cut-intensity-factor"```, which denotes the fraction of maximum, above which the function is cut in Fourier space. For instance, setting it to 4 would mean that on normalised scale the inverse Gaussian profile *H*<sup> -1</sup>(&nu;) will be set to zero if it is above 1/4th of maximum, as in the picture below:
+
+[img INV Gauss]
+
+For Gaussian and CDF kernel shapes, the optimal span ```"semi-axis-span-sigma-factor"``` is somewhere between &plusmn;3.5&sigma; and &plusmn;4.0&sigma;. However, as seen from the image on the right (image space), even without cut-off or smoothing, inverse form *h*<sup> -1</sup>(&moddot;) requires much larger semi-axis for ellipsoid. In the example given for point-like source, it is set to 9.0 for all filters, but we do not recommend it lower than 13.0 for inverse Gaussian. Using three high-pass filters with cun-off and smoothing window (lower ```"alpha"```) might require even larger ```"semi-axis-span-sigma-factor"``` for each component, affecting drastically the performance which depend on the volume of the ellipsoid.

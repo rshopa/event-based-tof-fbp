@@ -4,10 +4,9 @@
 ############################
 # system tools for importing and exporting data
 
-# imports image as .rds, .nrrd or ASCII
 importImage <- function(Path.to.image, Header=TRUE){ # can contain header variable
-  if(grepl("\\.rds$", ext <- tolower(Path.to.image))) return(readRDS(Path.to.image))
-  else return(if(grepl("\\.nrrd$", tolower(Path.to.image)))
+  if(grepl("\\.rds$", ext <- tolower(Path.to.image),ignore.case = T)) return(readRDS(Path.to.image))
+  else return(if(grepl("\\.nrrd$", tolower(Path.to.image),ignore.case = T))
                 nat::read.nrrd(Path.to.image) # try reading as .nrrd binary
               else import3DImageASCII(Path.to.image, Header)) # header is required
 }

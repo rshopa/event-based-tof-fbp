@@ -1,0 +1,50 @@
+{
+  "input-output":{
+		"input-data-path": "examples/phantoms/iec_nema/emissions_1mlnWLS_CRT100ps.rds",
+		"output-file-name": "ReconstructedImage",
+		"attenuation-map-path": "examples/phantoms/iec_nema/att_map_iec.rds",
+		"sensitivity-map-path": "examples/sensitivity_map/sensitivity_map.rds",
+                "save-as-nrrd": true
+	},
+	"virtual-scanner":{
+	  "radius": 43.73,
+	  "number-of-strips": 384,
+	  "length": 50,
+	  "number-of-rings": 96,
+	  "CRT": 100.0,
+	  "sigma-z": null
+	},
+	"FBP-filter":{
+	  "delta-s": null,
+	  "alpha": 0.85,
+	  "omega-cut": 0.4,
+	  "tau-regularisation": 4.5,
+	  "zoom": null,
+	  "dummy-FFT-span": null,
+	  "semi-axis-span-sigma-factor": 11.0
+	},
+	"TOF-filter":{
+	  "filter-type": "CDF",
+	  "sigma": null,
+	  "half-bin-width": null,
+	  "alpha": null,
+	  "nu-cut-intensity-factor": null,
+	  "dummy-FFT-span": null,
+	  "semi-axis-span-sigma-factor": 3.0
+	},
+	"Z-filter":{
+	  "filter-type": "CDF",
+	  "sigma": 0.111,
+	  "half-bin-width": null,
+	  "alpha": null,
+	  "nu-cut-intensity-factor": null,
+	  "dummy-FFT-span": null,
+	  "semi-axis-span-sigma-factor": 3.0
+	},
+	"post-filter":{
+	  "type": "median",
+	  "radius": 5,
+	  "ball-shaped": true
+	},
+	"restrict-FOV-axes-range": [17,13,13]
+}

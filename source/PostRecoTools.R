@@ -48,8 +48,8 @@ PostRecoTools <- function(Params.JSON){
   # post-filter if present
   if(!is.null(Params.JSON[["filters"]][["post-filter"]])){
     # load library and compile functions
+    require("RcppArmadillo", quietly = TRUE)
     cat("Loading cpp functions for post-filtering... ")
-    require("RcppArmadillo")
     sourceCpp("cpp/ConvolutionalFilers3D.cpp", env = environment())
     cat("Done!\n")
     # applies convolutional median or mean average filter

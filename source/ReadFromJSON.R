@@ -46,8 +46,7 @@ JSONReader <- setRefClass(
                             .self$.validateVirtualScanner() &
                             .self$.validateTOFfilter(json_list) &
                             .self$.validateZfilter(json_list)   &
-          .self$.nonNULLnonZeroLength(is.logical(.self[[".export_as_nrrd"]] <- 
-                                                   json_list[["save-as-nrrd"]]))
+          .self$.nonNULLnonZeroLength(is.logical(.self[[".export_as_nrrd"]]))
         if(validated_fields){
           .self[[".is_imported"]] <- TRUE
           # filter out redundant fields in filters
@@ -73,6 +72,8 @@ JSONReader <- setRefClass(
       # check if any attenuations
       .self[["corrections"]] <- list(attenuation=.self$.fullPath(IO_list[["attenuation-map-path"]]),
                                      sensitivity=.self$.fullPath(IO_list[["sensitivity-map-path"]]))
+      # how to export the reconstructed image
+      .self[[".export_as_nrrd"]] <- IO_list[["save-as-nrrd"]]
     },
     # shrinks FOV to the volume limited by [-axes_ranges, axes_ranges]
     .updateFOVspan = function(json_list){

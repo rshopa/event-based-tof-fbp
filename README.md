@@ -58,6 +58,6 @@ The script is designed to work as quick as possible, hence R environments are ut
 Assuming all script files are in the same place, execute simply the following to run the reconstruction:
 ```
 $ cd <TOF_FBP_app_dir>
-$ Rscript [--vanilla] source/LaunchReconstruction.R <path_to_json_params_file>
+$ Rscript [--vanilla] source/LaunchReconstruction.R <path_to_json_params_file> [> log_file.log]
 ```
 Here, ```<path_to_json_params_file>``` denotes the path to JSON file with parameters (see ```examples/```). The option ```--vanilla``` [prevents Rscript from reading R history, profile, or environment files, as well as reloading data or objects from previous sessions](https://stat.ethz.ch/R-manual/R-devel/library/base/html/Startup.html).

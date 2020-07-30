@@ -6,8 +6,8 @@
 # Ruru Li et al. Journal of Information & Computational Science 7:14 (2010) 3125
 
 SetEnvForAttenuation <- function(Att.file){
-  # import attenuation map as ASCII or .RData 
-  # (binary means map is stored in .RData)
+  # import attenuation map as ASCII or .rds
+  # (binary means map is stored in .rds)
   cat("Loading attenuation map... ")
   attenuation.map <- importImage(Att.file)
   cat("Done!\nRedefine map as factors... ")
