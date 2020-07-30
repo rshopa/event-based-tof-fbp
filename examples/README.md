@@ -30,6 +30,6 @@ This will save the map as ```.rds``` in the same directory as 2D image.
 
 **Caution: the examples presented here don't cover the whole transverse FOV!** You need to manually restrict XY-span of the image using parameter ```restrict-FOV-axes-range``` in the main JSON file (see below).
 
-![alt text](https://github.com/rshopa/event-based-tof-fbp/blob/master/images/FOV_sizes.png)
+<img src="https://github.com/rshopa/event-based-tof-fbp/blob/master/examples/images/FOV_sizes.png" width="500">
 
 ## JSON parameters for the reconstruction
