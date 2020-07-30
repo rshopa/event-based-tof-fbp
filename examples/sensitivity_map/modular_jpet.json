@@ -1,0 +1,9 @@
+{
+	"output-name": "sensitivity_map",	
+	"scanner-radius": 41.61,
+	"scanner-length": 140.0,
+	"number-of-strips": 420,
+	"number-of-rings": 270,
+	"zoom": 2,
+	"png-xy-size": 0.48531
+}

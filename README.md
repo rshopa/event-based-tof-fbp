@@ -1,5 +1,5 @@
 # Image reconstruction by event-based 3D TOF FBP
-This application, written in [R language](https://cran.r-project.org/), is devoted to image reconstruction for J-PET, using a combination of three independent kernels functions in image domain, similar to [multivariate kernel density estimation (KDE)](https://en.wikipedia.org/wiki/Multivariate_kernel_density_estimation "Wikipedia"), but with asymmetric definition.
+This application, written in [R language](https://cran.r-project.org/), is devoted to image reconstruction for Jagiellonian PET (J-PET), using a combination of three independent kernel functions in image domain, similar to [multivariate kernel density estimation (KDE)](https://en.wikipedia.org/wiki/Multivariate_kernel_density_estimation "Wikipedia"), but with asymmetric definition.
 
 ## Prerequisites
 Tested on Ubuntu 16.04 LTE with R version 3.6.3 installed, as well as on Scientific Linux CERN SLC release 6.10, with R version 3.4.1. The script operates with some shell commands
@@ -16,7 +16,7 @@ Additional R packages are required:
 There is no need to install anything. Just put directories ```modules/```, ```source/``` and ```cpp/``` into a single location, in order to match the paths properly.
 
 ## Input data and parameters
-The application proceeds with [GOJA output format](https://github.com/JPETTomography/j-pet-gate-tools/tree/master/goja#goja-output) (16-column ASCII) as the input, but uses only first 8 columns: ```(hit1_x, hit1_y, hit1_z, time_of_hit1, hit2_x, hit2_y, hit2_z, time_of_hit2)```. Cartesian coordinates ```hit*_*``` must be in cm, time tags -- in ps.
+The application proceeds with [GOJA output format](https://github.com/JPETTomography/j-pet-gate-tools/tree/master/goja#goja-output) (16-column ASCII) as the input, but uses only first 8 columns: ```(hit1_x, hit1_y, hit1_z, time_of_hit1, hit2_x, hit2_y, hit2_z, time_of_hit2)```. Cartesian coordinates ```hit*_*``` must be in centimetres, time tags -- in picoseconds.
 
 The parameters for the reconstruction, sensitivity map generation, as well as the geometry of the scanner, are stored in JSON format: it is self-describing and easy to undersand. Please refer to the ```examples/``` directory for the details.
 
