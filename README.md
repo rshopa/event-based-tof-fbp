@@ -11,7 +11,7 @@ Additional R packages are required:
 * [RcppArmadillo](https://cran.r-project.org/web/packages/RcppArmadillo/index.html)
 * [data.table](https://github.com/Rdatatable/data.table/wiki) (optional)
 * [nat](https://cran.r-project.org/web/packages/nat/index.html) (optional - for reading ```.nrrd``` sensitivity map)
-* [RColorBrewer](https://cran.r-project.org/web/packages/RColorBrewer/index.html) (optional - for plotting images)
+<!-- ** [RColorBrewer](https://cran.r-project.org/web/packages/RColorBrewer/index.html) (optional - for plotting images) -->
 
 There is no need to install anything. Just put directories ```modules/```, ```source/``` and ```cpp/``` into a single location, in order to match the paths properly.
 
