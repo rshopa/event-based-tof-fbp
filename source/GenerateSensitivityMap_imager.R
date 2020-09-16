@@ -38,7 +38,7 @@ size.z  <- as.integer(params[["number-of-rings"]]*2-1)
 axis.z  <- seq_len(size.z)*delta.z - params[["scanner-length"]]/2
 
 # resize XY-sensitivity (EBImage) and reassign as unrolled vector
-unrolled.sens.xy <- c(resize(sens.xy, size.xy, size.xy)[,,1,1],interpolation_type = 2)
+unrolled.sens.xy <- c(resize(sens.xy, size.xy, size.xy,interpolation_type = 2)[,,1,1])
 # unrolled vector of radii, i.e. sqrt(x^2+y^2)
 unrolled.rs <- sqrt(rep(axis.xy,length(axis.xy))^2 + rep(axis.xy,each=length(axis.xy))^2)
 # create sensitivity matrix
