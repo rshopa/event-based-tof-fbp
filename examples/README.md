@@ -23,7 +23,7 @@ Two features here are employed in the same way as in [STIR](http://stir.sourcefo
 
 To run a generation of 3D sensitivity map using XY ```.png```-dummy, execute the following:
 ```
-$ Rscript [--vanilla] source/GenerateSystemMap.R <json_params> <xy_sensitivity_png>
+$ Rscript [--vanilla] source/GenerateSensitivityMap.R <json_params> <xy_sensitivity_png>
 ```
 This will save the map as ```.rds``` in the same directory as 2D image.
 
