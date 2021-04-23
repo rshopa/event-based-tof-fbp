@@ -52,12 +52,17 @@ Here, a proper order should be preserved for al coordinates.
 Available output file formats are ```.rds``` and ```.nrrd```. The former is native to R (has the same list structure as [described above](https://github.com/rshopa/event-based-tof-fbp#map-formats-for-corrections)), while the latter is also used in [J-PET MLEM](https://github.com/JPETTomography/j-pet-mlem) application. You need external app to view ```.nrrd``` images or dedicated libraries, e.g. [MRIcroGL](https://www.nitrc.org/projects/mricrogl), [Aliza](https://www.aliza-dicom-viewer.com/), [pynrrd](https://pypi.org/project/pynrrd/) etc. Store the outcome as ```.rds``` only if you are familiar with basic R: you need to run it interactively or write a dedicated script to view the images.
 
 ## Script architecture
-The script is designed to work as quick as possible, hence R environments are utilised for [encapsulation](https://r6.r-lib.org/articles/Performance.html). The only exclusion has been made for JSON reader ```source/ReadFromJSON.R```, which uses Reference class.
+The script is designed to work as quick as possible, hence [Rcpp](http://www.rcpp.org/) package is used and R environments are utilised for the [encapsulation](https://r6.r-lib.org/articles/Performance.html). The only exception has been made for JSON reader ```source/ReadFromJSON.R```, which uses Reference class.
 
 ## Usage
-Assuming all script files are in the same place, execute simply the following to run the reconstruction:
+The implementation can be run in a single-thread mode or in parallel on multi-core nodes ([Open MPI](https://www.open-mpi.org/) is required). Assuming all script files are in the same place, execute the following to run the reconstruction:
 ```
 $ cd <TOF_FBP_app_dir>
 $ Rscript [--vanilla] source/LaunchReconstruction.R <path_to_json_params_file> [> log_file.log]
 ```
+or (in multi-thread):
+```
+$ Rscript [--vanilla] source/LaunchReconstructionParallel.R <path_to_json_params_file> [> log_file.log]
+```
+
 Here, ```<path_to_json_params_file>``` denotes the path to JSON file with parameters (see ```examples/```). The option ```--vanilla``` [prevents Rscript from reading R history, profile, or environment files, as well as reloading data or objects from previous sessions](https://stat.ethz.ch/R-manual/R-devel/library/base/html/Startup.html).

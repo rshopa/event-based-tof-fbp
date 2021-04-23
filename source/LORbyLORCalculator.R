@@ -7,9 +7,6 @@
 LORbyLORCalculator <- function(Params.JSON){
   # set initial environments and compile cpp functions
   source("source/SetEnvWithIniParams.R", local = TRUE)
-  cat("Loading cpp functions... ")
-  sourceCpp("cpp/IntensityEstimator.cpp", env = environment())
-  cat("Done!\n")
   # import parameters from JSON list
   Ini.parameters <- SetEnvWithIniParams(Params.JSON) # constants
   # if non-null, attenuate
@@ -193,7 +190,7 @@ LORbyLORCalculator <- function(Params.JSON){
                                      Sin.Q*Sin.F)/Cos.Q),
                                   1))
   }
-  # creates XY-grid for the selected Z-slice, restricted by ROI ellipsoid 
+  # creates XY-grid for the selected Z-slice, restricted by ROR ellipsoid 
   .createTransverseGrid <- function(XY.span, 
                                     Slice.centre, 
                                     A.elps, B.elps, C.elps,
@@ -246,7 +243,7 @@ LORbyLORCalculator <- function(Params.JSON){
                                              B.elps = Ini.parameters[[".semi.axis.TOF"]],
                                              C.elps = Ini.parameters[[".semi.axis.RL"]],
                                              Cos.theta, Sin.theta, Cos.phi, Sin.phi)
-      if(is.null(xy.slice.list)) break() # skip if empty
+      if(is.null(xy.slice.list)) return() # skip if empty (break() is bad solution here)
         intensities <- estimateIntensity_cpp(xy.slice.list[[1]],
                                              xy.slice.list[[2]],
                                              rep(z.r, xy.slice.list[[3]]),
@@ -269,7 +266,7 @@ LORbyLORCalculator <- function(Params.JSON){
     z.span <- .detectZSpan(Ann.pt[3], Cos.theta)
     z.IDs  <- .matchedAxisFactor(Ini.parameters[["axis.z"]], z.span, Ini.parameters[["delta.z"]])
     # exception (outside FOV, length = 0)
-    if(length(z.IDs)==0) break()
+    if(length(z.IDs)==0) return() # skip if empty (break() is bad solution here)
     z.grid.set <- Ini.parameters[["axis.z"]][z.IDs]
     # reassign for convenience
     a.elps <- Ini.parameters[[".semi.axis.TOF"]]
@@ -291,7 +288,7 @@ LORbyLORCalculator <- function(Params.JSON){
         xy.slice.list <- .createTransverseGrid(xy.span, slice.centre, 
                                                a.elps, b.elps, c.elps,
                                                Cos.theta, Sin.theta, Cos.phi, Sin.phi)
-        if(is.null(xy.slice.list)) break() # skip if empty
+        if(is.null(xy.slice.list)) return() # skip if empty (break() is bad solution here)
         intensities <- estimateIntensity_cpp(xy.slice.list[[1]],
                                              xy.slice.list[[2]],
                                              rep(z.r, xy.slice.list[[3]]),

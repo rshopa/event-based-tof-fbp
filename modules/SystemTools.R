@@ -14,7 +14,8 @@ importImage <- function(Path.to.image, Header=TRUE){ # can contain header variab
 importASCII <- function(Path.to.ASCII, Header=FALSE){
   rows <- if("data.table" %in% rownames(installed.packages()))
     as.matrix(data.table::fread(Path.to.ASCII, header=Header))
-  else as.matrix(read.table(Path.to.ASCII, header=Header))
+  else as.matrix(read.table(Path.to.ASCII, header=Header,
+                            integer64 = "numeric", fill=TRUE))   # NEW CODE: prevent conversion to integer
   attributes(rows)["dimnames"] <- NULL # will be processed faster
   return(rows)
 }

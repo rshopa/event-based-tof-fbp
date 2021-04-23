@@ -6,8 +6,8 @@
 # main file for the reconstruction
 require("methods", quietly = TRUE)    # essential for Rscript
 require("jsonlite", quietly = TRUE)
-require("EBImage", quietly = TRUE)
 require("Rcpp", quietly = TRUE)
+
 # extract directory of a script
 args <- commandArgs(trailingOnly = FALSE)
 # solution from here: stackoverflow.com/a/32016824/538403
@@ -28,8 +28,13 @@ setwd(paste0(script.dir,"/.."))
 source("modules/GeneralMath.R")
 source("modules/SystemTools.R")
 source("source/ReadFromJSON.R")
-source("source/LORbyLORCalculator.R")
 source("source/PostRecoTools.R")
+
+# load calculator which uses external Rcpp functions
+cat("Loading event-by-event calculator and cpp functions... ")
+source("source/LORbyLORCalculator.R")
+sourceCpp("cpp/IntensityEstimator.cpp", env = environment())
+cat("Done!\n")
 
 cat(paste("Script directory:",script.dir,"\n"))
 cat(paste("Current_directory:",getwd(),"\n"))
